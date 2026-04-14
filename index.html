@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>お手伝い記録</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="お手伝い記録">
+  <link rel="apple-touch-icon" href="icon.png">
+
   <style>
     body {
       font-family: sans-serif;
@@ -15,6 +22,7 @@
 
     h1 {
       text-align: center;
+      margin-bottom: 20px;
     }
 
     input, button {
@@ -23,13 +31,14 @@
       margin: 6px 0 12px 0;
       box-sizing: border-box;
       font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     button {
       background: #007aff;
       color: white;
       border: none;
-      border-radius: 8px;
     }
 
     .card {
@@ -49,6 +58,7 @@
       font-weight: bold;
       font-size: 18px;
       margin-top: 20px;
+      margin-bottom: 30px;
     }
 
     h3 {
@@ -61,6 +71,7 @@
       width: auto;
       padding: 8px 14px;
       font-size: 14px;
+      display: inline-block;
     }
   </style>
 </head>
@@ -76,19 +87,19 @@
   <div class="total" id="total"></div>
 
   <script>
-    let data = JSON.parse(localStorage.getItem("data") || "[]");
+    let data = JSON.parse(localStorage.getItem("helpData") || "[]");
 
     function add() {
-      const task = document.getElementById("task").value;
+      const task = document.getElementById("task").value.trim();
       const money = document.getElementById("money").value;
       const date = new Date().toLocaleDateString("ja-JP");
 
       if (!task || !money) return;
 
       data.push({
-        task,
+        task: task,
         money: Number(money),
-        date
+        date: date
       });
 
       document.getElementById("task").value = "";
@@ -98,7 +109,7 @@
     }
 
     function save() {
-      localStorage.setItem("data", JSON.stringify(data));
+      localStorage.setItem("helpData", JSON.stringify(data));
       render();
     }
 
