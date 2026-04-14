@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お手伝い記録</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 420px;
+      margin: auto;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0 12px 0;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .card {
+      background: white;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .day-total {
+      font-weight: bold;
+      margin: 8px 0 18px 0;
+    }
+
+    .total {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+
+    .delete-btn {
+      margin-top: 10px;
+      width: auto;
+      padding: 8px 14px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>お手伝い記録</h1>
+
+  <input id="task" placeholder="お手伝い内容">
+  <input id="money" type="number" placeholder="金額（円）">
+  <button onclick="add()">追加</button>
+
+  <div id="list"></div>
+  <div class="total" id="total"></div>
+
+  <script>
+    let data = JSON.parse(localStorage.getItem("data") || "[]");
+
+    function add() {
+      const task = document.getElementById("task").value;
+      const money = document.getElementById("money").value;
+      const date = new Date().toLocaleDateString("ja-JP");
+
+      if (!task || !money) return;
+
+      data.push({
+        task,
+        money: Number(money),
+        date
+      });
+
+      document.getElementById("task").value = "";
+      document.getElementById("money").value = "";
+
+      save();
+    }
+
+    function save() {
+      localStorage.setItem("data", JSON.stringify(data));
+      render();
+    }
+
+    function del(i) {
+      data.splice(i, 1);
+      save();
+    }
+
+    function render() {
+      const list = document.getElementById("list");
+      const total = document.getElementById("total");
+
+      list.innerHTML = "";
+      let sum = 0;
+
+      const grouped = {};
+
+      data.forEach((d, i) => {
+        if (!grouped[d.date]) {
+          grouped[d.date] = [];
+        }
+        grouped[d.date].push({ ...d, index: i });
+        sum += d.money;
+      });
+
+      for (const date in grouped) {
+        let dayTotal = 0;
+
+        list.innerHTML += `<h3>${date}</h3>`;
+
+        grouped[date].forEach((d) => {
+          dayTotal += d.money;
+
+          list.innerHTML += `
+            <div class="card">
+              ${d.task}（${d.money}円）<br>
+              <button class="delete-btn" onclick="del(${d.index})">削除</button>
+            </div>
+          `;
+        });
+
+        list.innerHTML += `<div class="day-total">この日の合計：${dayTotal}円</div>`;
+      }
+
+      total.innerText = "全体の合計：" + sum + "円";
+    }
+
+    render();
+  </script>
+
+</body>
+</html>
